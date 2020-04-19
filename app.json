@@ -4,8 +4,7 @@
   "keywords": [
     "Kafka",
     "Postgres",
-    "Connect",
-    "Redshift"
+    "Connect"
   ],
   "repository": "https://github.com/dhavalthakkar93/heroku-kafka-connect-source-heroku-postgres-sink-amazon-redshift-poc",
   "env": {
@@ -21,7 +20,7 @@
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "Performance-M"
+      "size": "Private-S"
     }
   },
   "addons" : [
