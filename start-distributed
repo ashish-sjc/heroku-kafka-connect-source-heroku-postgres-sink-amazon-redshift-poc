@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DEBEZIUM_CONNECTOR_URL="https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/0.7.2/debezium-connector-postgres-0.7.2-plugin.tar.gz"
+
 DYNO_CONNECT_DISTRIBUTED_PROPERTIES_FILE="dyno-connect-distributed.properties"
 
 kafka_addon_name=${KAFKA_ADDON:-KAFKA}
@@ -7,7 +9,6 @@ prefix_env_var="$(echo $kafka_addon_name)_PREFIX"
 kafka_prefix=$(echo ${!prefix_env_var})
 kafka_url_env_var="$(echo $kafka_addon_name)_URL"
 postgres_addon_name=${POSTGRES_ADDON:-DATABASE}
-
 
 ./setup_certs $kafka_addon_name
 
@@ -61,7 +62,7 @@ status.storage.replication.factor=1
 
 offset.flush.interval.ms=10000
 
-# These are provided to inform the user about the presence of the REST host and port configs 
+# These are provided to inform the user about the presence of the REST host and port configs
 # Hostname & Port for the REST API to listen on. If this is set, it will bind to the interface used to listen to requests.
 #rest.host.name=
 rest.port=$PORT
@@ -71,19 +72,24 @@ rest.port=$PORT
 #rest.advertised.port=
 
 # Set to a list of filesystem paths separated by commas (,) to enable class loading isolation for plugins
-# (connectors, converters, transformations). The list should consist of top level directories that include 
-# any combination of: 
+# (connectors, converters, transformations). The list should consist of top level directories that include
+# any combination of:
 # a) directories immediately containing jars with plugins and their dependencies
 # b) uber-jars with plugins and their dependencies
 # c) directories immediately containing the package directory structure of classes of plugins and their dependencies
-# Examples: 
+# Examples:
 # plugin.path=/usr/local/share/java,/usr/local/share/kafka/plugins,/opt/connectors,
 plugin.path=.apt/usr/share/java
 PROPERTIES
 
 mkdir .apt/usr/config
 cp .apt/etc/kafka/connect-log4j.properties .apt/usr/config
-wget https://s3.amazonaws.com/redshift-downloads/drivers/RedshiftJDBC42-1.2.1.1001.jar
-cp RedshiftJDBC42-1.2.1.1001.jar .apt/usr/share/java/kafka-connect-jdbc
+
+wget -qO - $DEBEZIUM_CONNECTOR_URL | tar -zxf -
+if ! [ $? ]; then
+  echo "could not download debezium connector"
+fi
+
+cp debezium-connector-postgres/*.jar .apt/usr/share/java/kafka
 
 KAFKA_HEAP_OPTS="-Xms1g -Xmx1g" .apt/usr/bin/connect-distributed dyno-connect-distributed.properties
