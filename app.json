@@ -20,15 +20,15 @@
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "Private-S"
+      "size": "Private-L"
     }
   },
   "addons" : [
     {
-      "plan": "heroku-postgresql:standard-0"
+      "plan": "heroku-postgresql:private-0"
     },
     {
-      "plan": "heroku-kafka:standard-0"
+      "plan": "heroku-kafka:private-standard-0"
     }
   ],
   "buildpacks": [
